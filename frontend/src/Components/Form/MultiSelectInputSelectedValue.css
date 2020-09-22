@@ -1,0 +1,18 @@
+.selectedValue {
+  composes: selectedValue from '~./EnhancedSelectInputSelectedValue.css';
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+.valueText {
+  @add-mixin truncate;
+
+  flex: 0 0 auto;
+}
+
+.isDisabled {
+  color: $disabledInputColor;
+}

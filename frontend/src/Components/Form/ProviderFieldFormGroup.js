@@ -6,7 +6,7 @@ import FormGroup from 'Components/Form/FormGroup';
 import FormLabel from 'Components/Form/FormLabel';
 import FormInputGroup from 'Components/Form/FormInputGroup';
 
-function getType(type) {
+function getType(type, value) {
   switch (type) {
     case 'captcha':
       return inputTypes.CAPTCHA;
@@ -23,6 +23,9 @@ function getType(type) {
     case 'filePath':
       return inputTypes.PATH;
     case 'select':
+      if (Array.isArray(value)) {
+        return inputTypes.MULTI_SELECT;
+      }
       return inputTypes.SELECT;
     case 'tag':
       return inputTypes.TEXT_TAG;
@@ -43,7 +46,8 @@ function getSelectValues(selectOptions) {
   return _.reduce(selectOptions, (result, option) => {
     result.push({
       key: option.value,
-      value: option.name
+      value: option.name,
+      hint: option.hint
     });
 
     return result;
@@ -84,7 +88,7 @@ function ProviderFieldFormGroup(props) {
       <FormLabel>{label}</FormLabel>
 
       <FormInputGroup
-        type={getType(type)}
+        type={getType(type, value)}
         name={name}
         label={label}
         helpText={helpText}

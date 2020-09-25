@@ -125,6 +125,7 @@ ProviderFieldFormGroup.propTypes = {
   errors: PropTypes.arrayOf(PropTypes.object).isRequired,
   warnings: PropTypes.arrayOf(PropTypes.object).isRequired,
   selectOptions: PropTypes.arrayOf(PropTypes.shape(selectOptionsShape)),
+  selectOptionsProviderAction: PropTypes.string,
   onChange: PropTypes.func.isRequired
 };
 

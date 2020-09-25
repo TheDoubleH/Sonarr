@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FluentValidation;
 using FluentValidation.Results;
 using NLog;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Common.Http;
+using NzbDrone.Core.Annotations;
 using NzbDrone.Core.Configuration;
 using NzbDrone.Core.Parser;
 using NzbDrone.Core.ThingiProvider;
@@ -132,6 +134,51 @@ namespace NzbDrone.Core.Indexers.Newznab
 
                 return new ValidationFailure(string.Empty, "Unable to connect to indexer, check the log for more details");
             }
+        }
+
+        public override object RequestAction(string action, IDictionary<string, string> query)
+        {
+            if (action == "getCategories")
+            {
+                // Ignore categories not relevant for Sonarr
+                var ignoreCategories = new[] { 0, 1000, 2000, 3000, 4000, 6000, 7000 };
+
+                var result = new List<FieldSelectOption>();
+                var capabilities = _capabilitiesProvider.GetCapabilities(Settings);
+                foreach (var category in capabilities.Categories)
+                {
+                    if (ignoreCategories.Contains(category.Id))
+                    {
+                        continue;
+                    }
+
+                    result.Add(new FieldSelectOption
+                    {
+                        Value = category.Id,
+                        Name = category.Name,
+                        Hint = $"({category.Id})"
+                    });
+
+                    foreach (var subcat in category.Subcategories)
+                    {
+                        result.Add(new FieldSelectOption
+                        {
+                            Value = subcat.Id,
+                            Name = subcat.Name,
+                            Hint = $"({subcat.Id})"
+                        });
+                    }
+                }
+
+                result.Sort((l, r) => l.Value.CompareTo(r.Value));
+
+                return new
+                {
+                    options = result
+                };
+            }
+
+            return base.RequestAction(action, query);
         }
     }
 }
